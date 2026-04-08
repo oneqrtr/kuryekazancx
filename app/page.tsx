@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { KazancTool } from '@/components/KazancTool';
 import { KuryeKazancIndexSection } from '@/components/KuryeKazancIndexSection';
 import { AdBanner } from '@/components/AdBanner';
+import { OnlineKuryeNotice } from '@/components/OnlineKuryeNotice';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -29,6 +30,10 @@ export default function Home() {
 
                 <div className="mt-8 mb-4">
                     <AdBanner />
+                </div>
+
+                <div className="flex justify-center mb-8">
+                    <OnlineKuryeNotice />
                 </div>
 
                 {/* Ana Kazanç Aracı */}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { KazancTool } from '@/components/KazancTool';
+import { OnlineKuryeNotice } from '@/components/OnlineKuryeNotice';
 import { generateSEO } from '@/lib/seo';
 
 export const metadata: Metadata = generateSEO({
@@ -32,6 +33,9 @@ export default function KuryeKazancHesaplamaPage() {
             Getir, Yemeksepeti) için geçerli <strong>paket başı</strong> ve <strong>saatlik</strong> gelirlerinizi
             hemen hesaplayın.
           </p>
+          <div className="flex justify-center mb-2">
+            <OnlineKuryeNotice />
+          </div>
         </div>
 
         <div id="hesapla">

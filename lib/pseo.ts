@@ -8,18 +8,6 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function getSpintaxContent(city: string, platform: string) {
-  const variations = [
-    `${city} ilinde kurye olarak çalışmak isteyenler için ${platform} kazanç detayları oldukça merak ediliyor. 2026 yılı güncel verilerine göre ${city} bölgesindeki paket yoğunluğu ve bonus sistemlerini aşağıda simüle edebilirsiniz.`,
-    `${platform} platformunda ${city} lokasyonunda hizmet veren esnaf kuryelerin aylık ortalama gelirleri, çalışma saatlerine ve atılan paket sayısına göre değişkenlik gösterir. İşte ${city} için hazırladığımız özel kazanç tablosu.`,
-    `${city} kurye piyasasında ${platform} ile yer almak, özellikle esnaf kurye modeliyle çalışanlar için ciddi bir gelir kapısı. 2026 yılı enflasyon ve yakıt maliyetleri gözetilerek ${city} odaklı bir hesaplama yaptık.`
-  ];
-  
-  // Şehir isminin uzunluğuna göre basit bir deterministik seçim (Google için her zaman aynı kalsın)
-  const index = city.length % variations.length;
-  return variations[index];
-}
-
 export function getDynamicMetadata(citySlug: string, platformSlug: string) {
   const city = INDEX_CITIES.find(c => c.slug === citySlug)?.name || capitalize(citySlug);
   const platform = INDEX_PLATFORMS.find(p => p.slug === platformSlug)?.name || capitalize(platformSlug);

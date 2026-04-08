@@ -1,9 +1,11 @@
 import { Suspense } from 'react';
 import { KazancTool } from '@/components/KazancTool';
 import { AdBanner } from '@/components/AdBanner';
-import { getDynamicMetadata, getSpintaxContent, capitalize, getCityOnlyMetadata, getCityOnlyContent } from '@/lib/pseo';
+import { getDynamicMetadata, getCityOnlyMetadata, getCityOnlyContent } from '@/lib/pseo';
+import { getCityPlatformPseoBlocks, getPlatformPseoBlocksGeneric, slugToPlatformKey } from '@/lib/pseo/platformParagraphs';
 import { INDEX_CITIES, INDEX_PLATFORMS, PLATFORM_DEFAULTS, type PlatformSlug } from '@/lib/kuryeKazancIndex';
 import { getPageBySlug } from '@/lib/content';
+import { OnlineKuryeNotice } from '@/components/OnlineKuryeNotice';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -68,6 +70,9 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
             <span className="text-blue-600">{cityName}</span> Kurye Kazancı 2026
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">{intro}</p>
+          <div className="mt-6 flex justify-center">
+            <OnlineKuryeNotice />
+          </div>
         </div>
 
         <AdBanner />
@@ -104,7 +109,7 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
     const cityName = cityObj.name;
     const platformName = platformObj.name;
     const defaults = PLATFORM_DEFAULTS[platformKey];
-    const intro = getSpintaxContent(cityName, platformName);
+    const pseo = getCityPlatformPseoBlocks(cityName, platformKey);
 
     return (
       <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -118,7 +123,13 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
             {cityName} <span className="text-blue-600">{platformName}</span> Kurye Kazancı 2026
           </h1>
-          <p className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">{intro}</p>
+          <div className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto space-y-4 text-left sm:text-center">
+            <p>{pseo.paragraphs[0]}</p>
+            <p>{pseo.paragraphs[1]}</p>
+          </div>
+          <div className="mt-6 flex justify-center">
+            <OnlineKuryeNotice />
+          </div>
         </div>
 
         <AdBanner />
@@ -128,8 +139,8 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
         </Suspense>
 
         <div className="mt-16 bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">{cityName} Bölgesinde Kuryelik</h2>
-          <p className="text-gray-600">{cityName} ilinde {platformName} ile çalışırken paket yoğunluğuna göre ek primler kazanabilirsiniz.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{pseo.sectionTitle}</h2>
+          <p className="text-gray-600 leading-relaxed">{pseo.sectionBody}</p>
         </div>
       </article>
     );
@@ -142,11 +153,23 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
 
     if (!page) notFound();
 
+    const platformKey = slugToPlatformKey(page.slug);
+    const genericPseo = platformKey ? getPlatformPseoBlocksGeneric(platformKey) : null;
+
     return (
       <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">{page.title}</h1>
-        <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">{page.intro}</p>
-        
+        <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">{page.intro}</p>
+        {genericPseo && (
+          <div className="text-base text-gray-600 mb-8 max-w-3xl mx-auto space-y-4 text-left">
+            <p>{genericPseo.paragraphs[0]}</p>
+            <p>{genericPseo.paragraphs[1]}</p>
+          </div>
+        )}
+        <div className="mb-8 flex justify-center">
+          <OnlineKuryeNotice />
+        </div>
+
         <Suspense fallback={<div className="animate-pulse h-96 bg-gray-100" />}>
           <KazancTool 
              initialPackageFee={page.package_fee} 
@@ -154,6 +177,13 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
              initialFuelCostPerDay={page.fuel_cost_per_day} 
           />
         </Suspense>
+
+        {genericPseo && (
+          <div className="mt-16 max-w-3xl mx-auto text-left bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{genericPseo.sectionTitle}</h2>
+            <p className="text-gray-600 leading-relaxed">{genericPseo.sectionBody}</p>
+          </div>
+        )}
         
         {page.content && (
           <div className="max-w-3xl mx-auto mt-12 text-left prose prose-blue">
