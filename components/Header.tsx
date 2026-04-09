@@ -21,7 +21,6 @@ export function Header() {
                         <nav className="hidden md:flex space-x-8">
                             <Link href="/" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">Ana Sayfa</Link>
                             <Link href="/kurye-kazanc-hesaplama" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">Kazanç Hesapla</Link>
-                            <Link href="/iletisim" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">İletişim</Link>
                         </nav>
                     </div>
                 </div>
