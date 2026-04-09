@@ -103,7 +103,14 @@ export function KazancTool({
 
         const citySlug = validateCitySlug(cityRaw);
         const platformSlug = validatePlatformSlug(platformRaw);
-        if (citySlug != null) setSelectedCitySlug(citySlug);
+        if (citySlug != null) {
+            setSelectedCitySlug(citySlug);
+            try {
+                localStorage.setItem('kurye_last_city_slug', citySlug);
+            } catch {
+                /* ignore */
+            }
+        }
         if (platformSlug != null) {
             setSelectedPlatformSlug(platformSlug);
             const def = PLATFORM_DEFAULTS[platformSlug];

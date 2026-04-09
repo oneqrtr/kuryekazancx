@@ -8,6 +8,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     '',
     '/kurye-kazanc-hesaplama',
+    '/iletisim',
+    '/gizlilik',
+    '/kullanim-sartlari',
+    '/cerez-politikasi',
   ].map(route => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),

@@ -3,17 +3,28 @@ import { KazancTool } from '@/components/KazancTool';
 import { AdBanner } from '@/components/AdBanner';
 import { getDynamicMetadata, getCityOnlyMetadata, getCityOnlyContent } from '@/lib/pseo';
 import { getCityPlatformPseoBlocks, getPlatformPseoBlocksGeneric, slugToPlatformKey } from '@/lib/pseo/platformParagraphs';
-import { INDEX_CITIES, INDEX_PLATFORMS, PLATFORM_DEFAULTS, type PlatformSlug } from '@/lib/kuryeKazancIndex';
+import {
+  INDEX_CITIES,
+  INDEX_PLATFORMS,
+  PLATFORM_DEFAULTS,
+  validateCitySlug,
+  type PlatformSlug,
+} from '@/lib/kuryeKazancIndex';
 import { getPageBySlug } from '@/lib/content';
 import { OnlineKuryeNotice } from '@/components/OnlineKuryeNotice';
+import { PlatformPseoDynamicBlocks } from '@/components/PlatformPseoDynamicBlocks';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+function firstSearchParam(v: string | string[] | undefined): string | null {
+  if (v == null) return null;
+  return typeof v === 'string' ? v : (v[0] ?? null);
+}
+
 interface PseoPageProps {
-  params: {
-    path: string[];
-  };
+  params: Promise<{ path: string[] }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: PseoPageProps): Promise<Metadata> {
@@ -45,8 +56,10 @@ export async function generateMetadata({ params }: PseoPageProps): Promise<Metad
   return { title: 'Kurye Kazanç Hesaplama' };
 }
 
-export default async function PseoUnifiedPage({ params }: PseoPageProps) {
+export default async function PseoUnifiedPage({ params, searchParams }: PseoPageProps) {
   const { path } = await params;
+  const sp = searchParams ? await searchParams : {};
+  const cityParam = firstSearchParam(sp.city);
 
   // 0. SADECE ŞEHİR (/[city]/kurye-kazanci)
   if (path.length === 2 && path[1] === 'kurye-kazanci') {
@@ -154,35 +167,43 @@ export default async function PseoUnifiedPage({ params }: PseoPageProps) {
     if (!page) notFound();
 
     const platformKey = slugToPlatformKey(page.slug);
-    const genericPseo = platformKey ? getPlatformPseoBlocksGeneric(platformKey) : null;
+    const urlCitySlug = validateCitySlug(cityParam);
+    const genericPseo = platformKey ? getPlatformPseoBlocksGeneric(platformKey, cityParam) : null;
 
     return (
       <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">{page.title}</h1>
         <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">{page.intro}</p>
-        {genericPseo && (
-          <div className="text-base text-gray-600 mb-8 max-w-3xl mx-auto space-y-4 text-left">
-            <p>{genericPseo.paragraphs[0]}</p>
-            <p>{genericPseo.paragraphs[1]}</p>
-          </div>
-        )}
-        <div className="mb-8 flex justify-center">
-          <OnlineKuryeNotice />
-        </div>
-
-        <Suspense fallback={<div className="animate-pulse h-96 bg-gray-100" />}>
-          <KazancTool 
-             initialPackageFee={page.package_fee} 
-             initialPackagesPerDay={page.packages_per_day} 
-             initialFuelCostPerDay={page.fuel_cost_per_day} 
-          />
-        </Suspense>
-
-        {genericPseo && (
-          <div className="mt-16 max-w-3xl mx-auto text-left bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{genericPseo.sectionTitle}</h2>
-            <p className="text-gray-600 leading-relaxed">{genericPseo.sectionBody}</p>
-          </div>
+        {genericPseo && platformKey ? (
+          <PlatformPseoDynamicBlocks
+            platformKey={platformKey}
+            initialBlocks={genericPseo}
+            urlCitySlug={urlCitySlug}
+          >
+            <div className="mb-8 flex justify-center">
+              <OnlineKuryeNotice />
+            </div>
+            <Suspense fallback={<div className="animate-pulse h-96 bg-gray-100" />}>
+              <KazancTool
+                initialPackageFee={page.package_fee}
+                initialPackagesPerDay={page.packages_per_day}
+                initialFuelCostPerDay={page.fuel_cost_per_day}
+              />
+            </Suspense>
+          </PlatformPseoDynamicBlocks>
+        ) : (
+          <>
+            <div className="mb-8 flex justify-center">
+              <OnlineKuryeNotice />
+            </div>
+            <Suspense fallback={<div className="animate-pulse h-96 bg-gray-100" />}>
+              <KazancTool
+                initialPackageFee={page.package_fee}
+                initialPackagesPerDay={page.packages_per_day}
+                initialFuelCostPerDay={page.fuel_cost_per_day}
+              />
+            </Suspense>
+          </>
         )}
         
         {page.content && (

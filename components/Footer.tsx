@@ -8,7 +8,8 @@ export function Footer() {
                     <div className="mb-4 md:mb-0">
                         <p className="text-sm">© 2026 kuryekazanc.com.tr</p>
                     </div>
-                    <div className="flex flex-wrap gap-4 text-sm">
+                    <div className="flex flex-wrap gap-4 text-sm justify-center md:justify-end">
+                        <Link href="/iletisim" className="hover:text-blue-400 transition-colors">İletişim</Link>
                         <Link href="/gizlilik" className="hover:text-blue-400 transition-colors">Gizlilik</Link>
                         <Link href="/kullanim-sartlari" className="hover:text-blue-400 transition-colors">Kullanım Şartları</Link>
                         <Link href="/cerez-politikasi" className="hover:text-blue-400 transition-colors">Çerez Politikası</Link>

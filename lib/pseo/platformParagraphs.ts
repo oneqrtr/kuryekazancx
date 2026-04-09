@@ -1,5 +1,5 @@
 import type { PlatformSlug } from '@/lib/kuryeKazancIndex';
-import { getPlatformNameBySlug } from '@/lib/kuryeKazancIndex';
+import { getCityNameBySlug, getPlatformNameBySlug, validateCitySlug } from '@/lib/kuryeKazancIndex';
 
 /**
  * Şehir + platform PSEO sayfaları için platforma özgü metinler.
@@ -87,11 +87,16 @@ export function getCityPlatformPseoBlocks(cityName: string, platformSlug: Platfo
   };
 }
 
-/** Tek segment platform sayfaları (ör. /getir-kurye-kazanci) — şehir yok */
-const GENERIC_CITY_LABEL = 'Çalıştığınız ilde';
+/** Tek segment platform sayfaları (ör. /getir-kurye-kazanci). {city} şehir adı veya yedek metinle dolar. */
+const FALLBACK_CITY_LABEL = 'İliniz';
 
-export function getPlatformPseoBlocksGeneric(platformSlug: PlatformSlug): PlatformPseoBlock {
-  return getCityPlatformPseoBlocks(GENERIC_CITY_LABEL, platformSlug);
+export function getPlatformPseoBlocksGeneric(
+  platformSlug: PlatformSlug,
+  citySlugFromQuery?: string | null,
+): PlatformPseoBlock {
+  const slug = citySlugFromQuery ? validateCitySlug(citySlugFromQuery) : null;
+  const cityName = slug ? getCityNameBySlug(slug) : null;
+  return getCityPlatformPseoBlocks(cityName ?? FALLBACK_CITY_LABEL, platformSlug);
 }
 
 export function slugToPlatformKey(slug: string): PlatformSlug | null {

@@ -40,7 +40,14 @@ export function KuryeKazancIndexSection() {
                 <button
                   key={city.slug}
                   type="button"
-                  onClick={() => setSelectedCity(city)}
+                  onClick={() => {
+                    setSelectedCity(city);
+                    try {
+                      localStorage.setItem('kurye_last_city_slug', city.slug);
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     selectedCity?.slug === city.slug
                       ? 'bg-blue-600 text-white'
